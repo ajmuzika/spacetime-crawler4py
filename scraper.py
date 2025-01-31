@@ -37,7 +37,8 @@ def is_valid(url):
         *.stat.uci.edu/*
         today.uci.edu/department/information_computer_sciences/*
         """
-        return re.match(r"*.ics.uci.edu", parsed.netloc.lower()) or re.match(r"*.cs.uci.edu", parsed.netloc.lower()) or re.match(r"*.informatics.uci.edu", parsed.netloc.lower()) or re.match(r"*.stat.uci.edu", parsed.netloc.lower()):
+        if not (re.match(r"*.ics.uci.edu", parsed.netloc.lower()) or re.match(r"*.cs.uci.edu", parsed.netloc.lower()) or re.match(r"*.informatics.uci.edu", parsed.netloc.lower()) or re.match(r"*.stat.uci.edu", parsed.netloc.lower())):
+            return False
         # TODO today url if we need it
         
         return not re.match(
