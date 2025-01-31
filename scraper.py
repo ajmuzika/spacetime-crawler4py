@@ -29,6 +29,17 @@ def is_valid(url):
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
+
+        """
+        *.ics.uci.edu/*
+        *.cs.uci.edu/*
+        *.informatics.uci.edu/*
+        *.stat.uci.edu/*
+        today.uci.edu/department/information_computer_sciences/*
+        """
+        return re.match(r"*.ics.uci.edu", parsed.netloc.lower()) or re.match(r"*.cs.uci.edu", parsed.netloc.lower()) or re.match(r"*.informatics.uci.edu", parsed.netloc.lower()) or re.match(r"*.stat.uci.edu", parsed.netloc.lower()):
+        # TODO today url if we need it
+        
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
