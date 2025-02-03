@@ -1,5 +1,6 @@
 import re
 from urllib.parse import urlparse
+from bs4 import BeautifulSoup # TODO Cite https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -16,10 +17,18 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
 
-    print(resp.raw_response.content)
-        
+    bsObject = BeautifulSoup(resp.raw_response.content, "html.parser")
+    linkSet = set()
+
+    ## TODO TODO TODO cite this properly to ensure academic honesty
+    for link in bsObject.find_all('a'):
+        if is_valid(link.get('href')):
+            print(link.get('href'))
+            linkSet.add(link.get('href'))
     
-    return list()
+    
+    
+    return list(linkSet)
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
@@ -27,6 +36,7 @@ def is_valid(url):
     # There are already some conditions that return False.
     try:
         parsed = urlparse(url)
+        
         if parsed.scheme not in set(["http", "https"]):
             return False
 
@@ -35,9 +45,8 @@ def is_valid(url):
         *.cs.uci.edu/*
         *.informatics.uci.edu/*
         *.stat.uci.edu/*
-        today.uci.edu/department/information_computer_sciences/*
         """
-        if not (re.match(r"*.ics.uci.edu", parsed.netloc.lower()) or re.match(r"*.cs.uci.edu", parsed.netloc.lower()) or re.match(r"*.informatics.uci.edu", parsed.netloc.lower()) or re.match(r"*.stat.uci.edu", parsed.netloc.lower())):
+        if not (re.search(r"ics.uci.edu", parsed.netloc.lower()) or re.search(r"cs.uci.edu", parsed.netloc.lower()) or re.search(r"informatics.uci.edu", parsed.netloc.lower()) or re.search(r"stat.uci.edu", parsed.netloc.lower())):
             return False
         # TODO today url if we need it
         
