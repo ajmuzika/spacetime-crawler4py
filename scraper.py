@@ -20,27 +20,50 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
 
-    if resp.raw_response.url == url:
+
+    
+    if resp.status != 200:
+        print("Bad Code")
         return []
+    
     bsObject = BeautifulSoup(resp.raw_response.content, "html.parser")
     linkSet = set()
+
+    # TODO TODO TODO Cite https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+    webpageText = bsObject.get_text()
+    textList = str(webpageText).strip().split())
+
+    if len(textList < 100):
+        print("Too Short")
+        return []
+
+    # TODO Check for longest
+    
 
     with open('visitedLinks.txt', 'a+') as linkFile:
         linkFile.seek(0)
         visited = [line.rstrip() for line in linkFile]
-    ## TODO TODO TODO cite this properly to ensure academic honesty
+        
+        ## TODO TODO TODO cite this properly to ensure academic honesty
         for link in bsObject.find_all('a'):
-            if is_valid(link.get('href')):
-                url = re.sub(r'www\.', "", link.get('href'))
-                url = re.sub(r'https://', "", url)
-                url = re.sub(r'http://', "", url)
-                if url not in visited:
-                    linkSet.add(link.get('href'))
+            url = link.get('href')
+            
+            if is_valid(url):
 
-                    print(url)
+                #TODO Cite https://docs.python.org/3/library/urllib.parse.html
+                parsedLink = urlparse(url)
+                parsedLink._replace(fragment="")
+                url = parsedLink.geturl()
+
+                url = re.sub(r'www\.', "", url)
+                
+                if url not in visited:
+                    linkSet.add(url)
+
+                    # print(url)
                     visited.append(url)
                     linkFile.write(url + '\n')
-        
+
     return list(linkSet)
 
 def is_valid(url):
@@ -53,13 +76,10 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
-        """
-        *.ics.uci.edu/*
-        *.cs.uci.edu/*
-        *.informatics.uci.edu/*
-        *.stat.uci.edu/*
-        """
         if not (re.search(r"ics.uci.edu", parsed.netloc.lower()) or re.search(r"cs.uci.edu", parsed.netloc.lower()) or re.search(r"informatics.uci.edu", parsed.netloc.lower()) or re.search(r"stat.uci.edu", parsed.netloc.lower())):
+            return False
+
+        if (re.search(r"date", parsed.query.lower()) or re.search(r"week", parsed.query.lower())): # Characteristic of calendar traps
             return False
         
         return not re.match(
