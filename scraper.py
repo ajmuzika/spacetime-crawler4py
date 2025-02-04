@@ -1,6 +1,9 @@
 import re
 from urllib.parse import urlparse
+from urllib.parse import urlunparse
 from bs4 import BeautifulSoup # TODO Cite https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+import pickle
+import os
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -17,17 +20,27 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
 
+    if resp.raw_response.url == url:
+        return []
     bsObject = BeautifulSoup(resp.raw_response.content, "html.parser")
     linkSet = set()
 
+    with open('visitedLinks.txt', 'a+') as linkFile:
+        linkFile.seek(0)
+        visited = [line.rstrip() for line in linkFile]
     ## TODO TODO TODO cite this properly to ensure academic honesty
-    for link in bsObject.find_all('a'):
-        if is_valid(link.get('href')):
-            print(link.get('href'))
-            linkSet.add(link.get('href'))
-    
-    
-    
+        for link in bsObject.find_all('a'):
+            if is_valid(link.get('href')):
+                url = re.sub(r'www\.', "", link.get('href'))
+                url = re.sub(r'https://', "", url)
+                url = re.sub(r'http://', "", url)
+                if url not in visited:
+                    linkSet.add(link.get('href'))
+
+                    print(url)
+                    visited.append(url)
+                    linkFile.write(url + '\n')
+        
     return list(linkSet)
 
 def is_valid(url):
@@ -48,7 +61,6 @@ def is_valid(url):
         """
         if not (re.search(r"ics.uci.edu", parsed.netloc.lower()) or re.search(r"cs.uci.edu", parsed.netloc.lower()) or re.search(r"informatics.uci.edu", parsed.netloc.lower()) or re.search(r"stat.uci.edu", parsed.netloc.lower())):
             return False
-        # TODO today url if we need it
         
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
