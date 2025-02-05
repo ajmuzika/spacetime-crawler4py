@@ -2,8 +2,9 @@ import re
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
 from bs4 import BeautifulSoup # TODO Cite https://www.crummy.com/software/BeautifulSoup/bs4/doc/
-import pickle
+import json
 import os
+import nltk
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -42,9 +43,26 @@ def extract_next_links(url, resp):
     # TODO Check for longest
     
 
-    with open('visitedLinks.txt', 'a+') as linkFile:
+    with open('visitedLinks.txt', 'a+') as linkFile, open('tokens.txt', 'a+') as tokenFile, open('longest.txt', 'w+') as longestPageFile:       
         linkFile.seek(0)
+        tokenFile.seek(0)
+        longestPageFile.seek(0)
+
+        longestPage = longestPageFile.read()
+
+        print(longestPage)
+
+        if not longestPage:
+            longestPageFile.write(url + "`" + str(len(bsObject.get_text())))
+        
+        elif (int(longestPage.split("`")[1]) < len(bsObject.get_text())):
+            longestPageFile.truncate(0)
+            longestPageFile.write(url + "`" + str(len(bsObject.get_text())))
+        
+        tokenFile.write(" ".join([x for x in nltk.word_tokenize(webpageText) if re.match(r'[a-zA-Z\'\-]+', x)]))
+
         visited = [line.rstrip() for line in linkFile]
+        
         
         ## TODO TODO TODO cite this properly to ensure academic honesty
         for link in bsObject.find_all('a'):
@@ -53,19 +71,17 @@ def extract_next_links(url, resp):
             if is_valid(newURL):
 
                 #TODO Cite https://docs.python.org/3/library/urllib.parse.html
-                parsedLink = urlparse(newURL)
-                parsedLink._replace(fragment="")
-                newURL = parsedLink.geturl()
-    
-                newURL = re.sub(r'www\.', "", newURL)
+                url_check = re.sub(r'www\.', "", newURL)
+                url_check = re.sub(r'https://', "", url_check)
+                url_check = re.sub(r'http://', "", url_check)
+                url_check = re.sub(r'#.+', "", url_check)
                 
-                
-                if newURL not in visited:
+                if url_check not in visited:
                     linkSet.add(newURL)
 
                     # print(url)
-                    visited.append(newURL)
-                    linkFile.write(newURL + '\n')
+                    visited.append(url_check)
+                    linkFile.write(url_check + '\n')
             else: 
                 pass
 
@@ -81,13 +97,11 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
-        #TODO TODO fix cecs.uci.edu
-        if not (re.search(r"ics.uci.edu", parsed.netloc.lower()) or re.search(r"cs.uci.edu", parsed.netloc.lower()) or re.search(r"informatics.uci.edu", parsed.netloc.lower()) or re.search(r"stat.uci.edu", parsed.netloc.lower())):
+        if not (re.search(r"^ics\.uci\.edu", parsed.netloc.lower()) or re.search(r"\.ics\.uci\.edu", parsed.netloc.lower()) or re.search(r"^cs\.uci\.edu", parsed.netloc.lower()) or re.search(r"\.cs\.uci\.edu", parsed.netloc.lower()) or re.search(r"^informatics\.uci\.edu", parsed.netloc.lower()) or re.search(r"\.informatics\.uci\.edu", parsed.netloc.lower()) or re.search(r"^stat\.uci\.edu", parsed.netloc.lower()) or re.search(r"\.stat\.uci\.edu", parsed.netloc.lower())):
             return False
 
-        if "tag" in parsed.query.lower(): # Keyword Reference Pages
-            return False
-        if "day" in parsed.query.lower() or "date" in parsed.query.lower() or "week" in parsed.query.lower() or "month" in parsed.query.lower() or "event" in parsed.query.lower(): # Characteristic of calendar traps
+
+        if (re.search(r"page", parsed.path.lower()) or re.search(r"tag", parsed.path.lower()) or re.search(r"day", parsed.path.lower()) or re.search(r"date", parsed.path.lower()) or re.search(r"week", parsed.path.lower()) or re.search(r"month", parsed.path.lower()) or re.search(r"event", parsed.path.lower())): # Characteristic of calendar traps
             return False
         
         return not re.match(
@@ -98,7 +112,7 @@ def is_valid(url):
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
-            + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
+            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|bib)$", parsed.path.lower())
 
     except TypeError:
         print ("TypeError for ", parsed)
