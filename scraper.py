@@ -20,7 +20,9 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
 
-
+    if not is_valid(url):
+        print("Bad Link")
+        return []
     
     if resp.status != 200:
         print("Bad Code")
@@ -31,9 +33,9 @@ def extract_next_links(url, resp):
 
     # TODO TODO TODO Cite https://www.crummy.com/software/BeautifulSoup/bs4/doc/
     webpageText = bsObject.get_text()
-    textList = str(webpageText).strip().split())
+    textList = str(webpageText).strip().split()
 
-    if len(textList < 100):
+    if len(textList) < 100:
         print("Too Short")
         return []
 
@@ -46,23 +48,26 @@ def extract_next_links(url, resp):
         
         ## TODO TODO TODO cite this properly to ensure academic honesty
         for link in bsObject.find_all('a'):
-            url = link.get('href')
-            
-            if is_valid(url):
+            newURL = link.get('href')
+
+            if is_valid(newURL):
 
                 #TODO Cite https://docs.python.org/3/library/urllib.parse.html
-                parsedLink = urlparse(url)
+                parsedLink = urlparse(newURL)
                 parsedLink._replace(fragment="")
-                url = parsedLink.geturl()
-
-                url = re.sub(r'www\.', "", url)
+                newURL = parsedLink.geturl()
+    
+                newURL = re.sub(r'www\.', "", newURL)
                 
-                if url not in visited:
-                    linkSet.add(url)
+                
+                if newURL not in visited:
+                    linkSet.add(newURL)
 
                     # print(url)
-                    visited.append(url)
-                    linkFile.write(url + '\n')
+                    visited.append(newURL)
+                    linkFile.write(newURL + '\n')
+            else: 
+                pass
 
     return list(linkSet)
 
@@ -76,10 +81,13 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
+        #TODO TODO fix cecs.uci.edu
         if not (re.search(r"ics.uci.edu", parsed.netloc.lower()) or re.search(r"cs.uci.edu", parsed.netloc.lower()) or re.search(r"informatics.uci.edu", parsed.netloc.lower()) or re.search(r"stat.uci.edu", parsed.netloc.lower())):
             return False
 
-        if (re.search(r"date", parsed.query.lower()) or re.search(r"week", parsed.query.lower())): # Characteristic of calendar traps
+        if (re.search(r"tag", parsed.query.lower())): # Keyword Reference Pages
+            return False
+        if (re.search(r"date", parsed.query.lower()) or re.search(r"week", parsed.query.lower()) or re.search(r"month", parsed.query.lower()) or re.search(r"event", parsed.query.lower())): # Characteristic of calendar traps
             return False
         
         return not re.match(
