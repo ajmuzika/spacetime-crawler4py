@@ -85,9 +85,9 @@ def is_valid(url):
         if not (re.search(r"ics.uci.edu", parsed.netloc.lower()) or re.search(r"cs.uci.edu", parsed.netloc.lower()) or re.search(r"informatics.uci.edu", parsed.netloc.lower()) or re.search(r"stat.uci.edu", parsed.netloc.lower())):
             return False
 
-        if (re.search(r"tag", parsed.query.lower())): # Keyword Reference Pages
+        if "tag" in parsed.query.lower(): # Keyword Reference Pages
             return False
-        if (re.search(r"date", parsed.query.lower()) or re.search(r"week", parsed.query.lower()) or re.search(r"month", parsed.query.lower()) or re.search(r"event", parsed.query.lower())): # Characteristic of calendar traps
+        if "day" in parsed.query.lower() or "date" in parsed.query.lower() or "week" in parsed.query.lower() or "month" in parsed.query.lower() or "event" in parsed.query.lower(): # Characteristic of calendar traps
             return False
         
         return not re.match(
