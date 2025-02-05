@@ -4,7 +4,7 @@ from urllib.parse import urlunparse
 from bs4 import BeautifulSoup # TODO Cite https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 import json
 import os
-import nltk
+import nltk # TODO Tell the TA in the report to install nltk
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -21,71 +21,75 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
 
-    if not is_valid(url):
-        print("Bad Link")
-        return []
+    try:
+        
+        if not is_valid(url):
+            print("Bad Link")
+            return []
+        
+        if resp.status != 200:
+            print("Bad Code")
+            return []
+        
+        bsObject = BeautifulSoup(resp.raw_response.content, "html.parser")
+        linkSet = set()
     
-    if resp.status != 200:
-        print("Bad Code")
-        return []
+        # TODO TODO TODO Cite https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+        webpageText = bsObject.get_text()
+        textList = str(webpageText).strip().split()
     
-    bsObject = BeautifulSoup(resp.raw_response.content, "html.parser")
-    linkSet = set()
-
-    # TODO TODO TODO Cite https://www.crummy.com/software/BeautifulSoup/bs4/doc/
-    webpageText = bsObject.get_text()
-    textList = str(webpageText).strip().split()
-
-    if len(textList) < 100:
-        print("Too Short")
-        return []
-
-    # TODO Check for longest
+        if len(textList) < 100:
+            print("Too Short")
+            return []
     
-
-    with open('visitedLinks.txt', 'a+') as linkFile, open('tokens.txt', 'a+') as tokenFile, open('longest.txt', 'w+') as longestPageFile:       
-        linkFile.seek(0)
-        tokenFile.seek(0)
-        longestPageFile.seek(0)
-
-        longestPage = longestPageFile.read()
-
-        print(longestPage)
-
-        if not longestPage:
-            longestPageFile.write(url + "`" + str(len(bsObject.get_text())))
+        # TODO Check for longest
         
-        elif (int(longestPage.split("`")[1]) < len(bsObject.get_text())):
-            longestPageFile.truncate(0)
-            longestPageFile.write(url + "`" + str(len(bsObject.get_text())))
-        
-        tokenFile.write(" ".join([x for x in nltk.word_tokenize(webpageText) if re.match(r'[a-zA-Z\'\-]+', x)]))
+    
+        with open('visitedLinks.txt', 'a+') as linkFile, open('tokens.txt', 'a+') as tokenFile, open('longest.txt', 'w+') as longestPageFile:       
+            linkFile.seek(0)
+            tokenFile.seek(0)
+            longestPageFile.seek(0)
+    
+            longestPage = longestPageFile.read()
+    
+    
+            if not longestPage:
+                longestPageFile.write(url + "`" + str(len(bsObject.get_text())))
+            
+            elif (int(longestPage.split("`")[1]) < len(bsObject.get_text())):
+                longestPageFile.truncate(0)
+                longestPageFile.write(url + "`" + str(len(bsObject.get_text())))
+            
+            tokenFile.write(" ".join([x for x in nltk.word_tokenize(webpageText) if re.match(r'^[a-zA-Z\'\-]+$', x)]))
+    
+            visited = [line.rstrip() for line in linkFile]
+            
+            
+            ## TODO TODO TODO cite this properly to ensure academic honesty
+            for link in bsObject.find_all('a'):
+                newURL = link.get('href')
+    
+                if is_valid(newURL):
+    
+                    #TODO Cite https://docs.python.org/3/library/urllib.parse.html
+                    url_check = re.sub(r'www\.', "", newURL)
+                    url_check = re.sub(r'https://', "", url_check)
+                    url_check = re.sub(r'http://', "", url_check)
+                    url_check = re.sub(r'#.+', "", url_check)
+                    
+                    if url_check not in visited:
+                        linkSet.add(newURL)
+    
+                        # print(url)
+                        visited.append(url_check)
+                        linkFile.write(url_check + '\n')
+                else: 
+                    pass
+    
+        return list(linkSet)
 
-        visited = [line.rstrip() for line in linkFile]
-        
-        
-        ## TODO TODO TODO cite this properly to ensure academic honesty
-        for link in bsObject.find_all('a'):
-            newURL = link.get('href')
-
-            if is_valid(newURL):
-
-                #TODO Cite https://docs.python.org/3/library/urllib.parse.html
-                url_check = re.sub(r'www\.', "", newURL)
-                url_check = re.sub(r'https://', "", url_check)
-                url_check = re.sub(r'http://', "", url_check)
-                url_check = re.sub(r'#.+', "", url_check)
-                
-                if url_check not in visited:
-                    linkSet.add(newURL)
-
-                    # print(url)
-                    visited.append(url_check)
-                    linkFile.write(url_check + '\n')
-            else: 
-                pass
-
-    return list(linkSet)
+    except:
+        return []
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
