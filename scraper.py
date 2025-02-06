@@ -45,7 +45,7 @@ def extract_next_links(url, resp):
         # TODO Check for longest
         
     
-        with open('visitedLinks.txt', 'a+') as linkFile, open('tokens.txt', 'a+') as tokenFile, open('longest.txt', 'w+') as longestPageFile:       
+        with open('visitedLinks.txt', 'a+') as linkFile, open('tokens.txt', 'a+') as tokenFile, open('longest.txt', 'a+') as longestPageFile:       
             linkFile.seek(0)
             tokenFile.seek(0)
             longestPageFile.seek(0)
@@ -60,7 +60,7 @@ def extract_next_links(url, resp):
                 longestPageFile.truncate(0)
                 longestPageFile.write(url + "`" + str(len(bsObject.get_text())))
             
-            tokenFile.write(" ".join([x for x in nltk.word_tokenize(webpageText) if re.match(r'^[a-zA-Z\'\-]+$', x)]))
+            tokenFile.write(" ".join([x for x in nltk.word_tokenize(webpageText) if re.match(r"^[a-zA-Z-]+$|^[a-zA-Z-]+\'[a-zA-Z]+$", x)]))
     
             visited = [line.rstrip() for line in linkFile]
             
