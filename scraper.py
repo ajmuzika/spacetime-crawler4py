@@ -66,8 +66,13 @@ def extract_next_links(url, resp):
             
             
             ## TODO TODO TODO cite this properly to ensure academic honesty
+            hyperlinksTotal = len(bsObject.find_all('a'))
             for link in bsObject.find_all('a'):
                 newURL = link.get('href')
+
+                if hyperlinksTotal / len(textList) > 0.75:
+                    print("Hyperlinks-to-Words Ratio Too High")
+                    return []
     
                 if is_valid(newURL):
     
@@ -105,8 +110,38 @@ def is_valid(url):
             return False
 
 
-        if (re.search(r"page", parsed.path.lower()) or re.search(r"tag", parsed.path.lower()) or re.search(r"day", parsed.path.lower()) or re.search(r"date", parsed.path.lower()) or re.search(r"week", parsed.path.lower()) or re.search(r"month", parsed.path.lower()) or re.search(r"event", parsed.path.lower())): # Characteristic of calendar traps
+        if (re.search(r"page", parsed.path.lower())     or re.search(r"page", parsed.query.lower())     or \
+            re.search(r"tag", parsed.path.lower())      or re.search(r"tag", parsed.query.lower())      or \
+            re.search(r"day", parsed.path.lower())      or re.search(r"day", parsed.query.lower())      or \
+            re.search(r"date", parsed.path.lower())     or re.search(r"date", parsed.query.lower())     or \
+            re.search(r"week", parsed.path.lower())     or re.search(r"week", parsed.query.lower())     or \
+            re.search(r"month", parsed.path.lower())    or re.search(r"month", parsed.query.lower())    or \
+            re.search(r"event", parsed.path.lower())    or re.search(r"event", parsed.query.lower())    or \
+            re.search(r"filter", parsed.path.lower())   or re.search(r"filter", parsed.query.lower())   or \
+            re.search(r"feed", parsed.path.lower())     or re.search(r"feed", parsed.query.lower())     or \
+            re.search(r"comment", parsed.path.lower())  or re.search(r"comment", parsed.query.lower())  or \
+            re.search(r"download", parsed.path.lower()) or re.search(r"download", parsed.query.lower()) or \
+            re.search(r"upname", parsed.path.lower())   or re.search(r"upname", parsed.query.lower())   or \
+            re.search(r"action", parsed.path.lower())   or re.search(r"action", parsed.query.lower())   or \
+            re.search(r"login", parsed.path.lower())    or re.search(r"login", parsed.query.lower())    or \
+            re.search(r"logout", parsed.path.lower())   or re.search(r"logout", parsed.query.lower())   or \
+            re.search(r"edit", parsed.path.lower())     or re.search(r"edit", parsed.query.lower())     or \
+            re.search(r"page_id=", parsed.path.lower())      or re.search(r"page_id=", parsed.query.lower())      or \
+            re.search(r"attachment", parsed.path.lower()) or re.search(r"attachment", parsed.query.lower()) or \
+            re.search(r"redirect", parsed.path.lower()) or re.search(r"redirect", parsed.query.lower()) or \
+            re.search(r"type", parsed.path.lower())     or re.search(r"type", parsed.query.lower())): # Characteristic of calendars and similar traps
             return False
+
+        if re.match(
+            r".*\.(css|js|bmp|gif|jpe?g|ico"
+            + r"|png|tiff?|mid|mp2|mp3|mp4"
+            + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
+            + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
+            + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
+            + r"|epub|dll|cnf|tgz|sha1"
+            + r"|thmx|mso|arff|rtf|jar|csv"
+            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|bib|py)$", parsed.query.lower()):
+                return False
         
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
@@ -116,7 +151,7 @@ def is_valid(url):
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
-            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|bib)$", parsed.path.lower())
+            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|bib|py)$", parsed.path.lower())
 
     except TypeError:
         print ("TypeError for ", parsed)
