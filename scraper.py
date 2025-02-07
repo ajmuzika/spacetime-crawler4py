@@ -41,8 +41,15 @@ def extract_next_links(url, resp):
         if len(textList) < 100:
             print("Too Short")
             return []
-    
-        # TODO Check for longest
+
+        if len(set(textList))/len(textList) < 0.10:
+            print("Unique Words to Total Words Ratio Too Low")
+            return []
+
+        hyperlinksTotal = len(bsObject.find_all('a'))
+        if hyperlinksTotal / len(textList) > 0.75:
+            print("Hyperlinks to Total Words Ratio Too High")
+            return []
         
     
         with open('visitedLinks.txt', 'a+') as linkFile, open('tokens.txt', 'a+') as tokenFile, open('longest.txt', 'a+') as longestPageFile:       
@@ -66,13 +73,8 @@ def extract_next_links(url, resp):
             
             
             ## TODO TODO TODO cite this properly to ensure academic honesty
-            hyperlinksTotal = len(bsObject.find_all('a'))
             for link in bsObject.find_all('a'):
                 newURL = link.get('href')
-
-                if hyperlinksTotal / len(textList) > 0.75:
-                    print("Hyperlinks-to-Words Ratio Too High")
-                    return []
     
                 if is_valid(newURL):
     
@@ -110,26 +112,26 @@ def is_valid(url):
             return False
 
 
-        if (re.search(r"page", parsed.path.lower())     or re.search(r"page", parsed.query.lower())     or \
-            re.search(r"tag", parsed.path.lower())      or re.search(r"tag", parsed.query.lower())      or \
-            re.search(r"day", parsed.path.lower())      or re.search(r"day", parsed.query.lower())      or \
-            re.search(r"date", parsed.path.lower())     or re.search(r"date", parsed.query.lower())     or \
-            re.search(r"week", parsed.path.lower())     or re.search(r"week", parsed.query.lower())     or \
-            re.search(r"month", parsed.path.lower())    or re.search(r"month", parsed.query.lower())    or \
-            re.search(r"event", parsed.path.lower())    or re.search(r"event", parsed.query.lower())    or \
-            re.search(r"filter", parsed.path.lower())   or re.search(r"filter", parsed.query.lower())   or \
-            re.search(r"feed", parsed.path.lower())     or re.search(r"feed", parsed.query.lower())     or \
-            re.search(r"comment", parsed.path.lower())  or re.search(r"comment", parsed.query.lower())  or \
-            re.search(r"download", parsed.path.lower()) or re.search(r"download", parsed.query.lower()) or \
-            re.search(r"upname", parsed.path.lower())   or re.search(r"upname", parsed.query.lower())   or \
-            re.search(r"action", parsed.path.lower())   or re.search(r"action", parsed.query.lower())   or \
-            re.search(r"login", parsed.path.lower())    or re.search(r"login", parsed.query.lower())    or \
-            re.search(r"logout", parsed.path.lower())   or re.search(r"logout", parsed.query.lower())   or \
-            re.search(r"edit", parsed.path.lower())     or re.search(r"edit", parsed.query.lower())     or \
-            re.search(r"page_id=", parsed.path.lower())      or re.search(r"page_id=", parsed.query.lower())      or \
+        if (re.search(r"page", parsed.path.lower())       or re.search(r"page", parsed.query.lower())       or \
+            re.search(r"tag", parsed.path.lower())        or re.search(r"tag", parsed.query.lower())        or \
+            re.search(r"day", parsed.path.lower())        or re.search(r"day", parsed.query.lower())        or \
+            re.search(r"date", parsed.path.lower())       or re.search(r"date", parsed.query.lower())       or \
+            re.search(r"week", parsed.path.lower())       or re.search(r"week", parsed.query.lower())       or \
+            re.search(r"month", parsed.path.lower())      or re.search(r"month", parsed.query.lower())      or \
+            re.search(r"event", parsed.path.lower())      or re.search(r"event", parsed.query.lower())      or \
+            re.search(r"filter", parsed.path.lower())     or re.search(r"filter", parsed.query.lower())     or \
+            re.search(r"feed", parsed.path.lower())       or re.search(r"feed", parsed.query.lower())       or \
+            re.search(r"comment", parsed.path.lower())    or re.search(r"comment", parsed.query.lower())    or \
+            re.search(r"download", parsed.path.lower())   or re.search(r"download", parsed.query.lower())   or \
+            re.search(r"upname", parsed.path.lower())     or re.search(r"upname", parsed.query.lower())     or \
+            re.search(r"action", parsed.path.lower())     or re.search(r"action", parsed.query.lower())     or \
+            re.search(r"login", parsed.path.lower())      or re.search(r"login", parsed.query.lower())      or \
+            re.search(r"logout", parsed.path.lower())     or re.search(r"logout", parsed.query.lower())     or \
+            re.search(r"edit", parsed.path.lower())       or re.search(r"edit", parsed.query.lower())       or \
+            re.search(r"page_id=", parsed.path.lower())   or re.search(r"page_id=", parsed.query.lower())   or \
             re.search(r"attachment", parsed.path.lower()) or re.search(r"attachment", parsed.query.lower()) or \
-            re.search(r"redirect", parsed.path.lower()) or re.search(r"redirect", parsed.query.lower()) or \
-            re.search(r"type", parsed.path.lower())     or re.search(r"type", parsed.query.lower())): # Characteristic of calendars and similar traps
+            re.search(r"redirect", parsed.path.lower())   or re.search(r"redirect", parsed.query.lower())   or \
+            re.search(r"type", parsed.path.lower())       or re.search(r"type", parsed.query.lower())): # Characteristic of calendars and similar traps
             return False
 
         if re.match(
