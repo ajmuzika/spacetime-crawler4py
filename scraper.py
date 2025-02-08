@@ -86,8 +86,7 @@ def extract_next_links(url, resp):
                     
                     if url_check not in visited:
                         linkSet.add(newURL)
-    
-                        # print(url)
+
                         visited.append(url_check)
                         linkFile.write(url_check + '\n')
                 else: 
@@ -112,26 +111,7 @@ def is_valid(url):
             return False
 
 
-        if (re.search(r"page", parsed.path.lower())       or re.search(r"page", parsed.query.lower())       or \
-            re.search(r"tag", parsed.path.lower())        or re.search(r"tag", parsed.query.lower())        or \
-            re.search(r"day", parsed.path.lower())        or re.search(r"day", parsed.query.lower())        or \
-            re.search(r"date", parsed.path.lower())       or re.search(r"date", parsed.query.lower())       or \
-            re.search(r"week", parsed.path.lower())       or re.search(r"week", parsed.query.lower())       or \
-            re.search(r"month", parsed.path.lower())      or re.search(r"month", parsed.query.lower())      or \
-            re.search(r"event", parsed.path.lower())      or re.search(r"event", parsed.query.lower())      or \
-            re.search(r"filter", parsed.path.lower())     or re.search(r"filter", parsed.query.lower())     or \
-            re.search(r"feed", parsed.path.lower())       or re.search(r"feed", parsed.query.lower())       or \
-            re.search(r"comment", parsed.path.lower())    or re.search(r"comment", parsed.query.lower())    or \
-            re.search(r"download", parsed.path.lower())   or re.search(r"download", parsed.query.lower())   or \
-            re.search(r"upname", parsed.path.lower())     or re.search(r"upname", parsed.query.lower())     or \
-            re.search(r"action", parsed.path.lower())     or re.search(r"action", parsed.query.lower())     or \
-            re.search(r"login", parsed.path.lower())      or re.search(r"login", parsed.query.lower())      or \
-            re.search(r"logout", parsed.path.lower())     or re.search(r"logout", parsed.query.lower())     or \
-            re.search(r"edit", parsed.path.lower())       or re.search(r"edit", parsed.query.lower())       or \
-            re.search(r"page_id=", parsed.path.lower())   or re.search(r"page_id=", parsed.query.lower())   or \
-            re.search(r"attachment", parsed.path.lower()) or re.search(r"attachment", parsed.query.lower()) or \
-            re.search(r"redirect", parsed.path.lower())   or re.search(r"redirect", parsed.query.lower())   or \
-            re.search(r"type", parsed.path.lower())       or re.search(r"type", parsed.query.lower())): # Characteristic of calendars and similar traps
+        if (re.search(r"page", parsed.path.lower()) or re.search(r"page", parsed.query.lower()) or re.search(r"tag", parsed.path.lower()) or re.search(r"tag", parsed.query.lower()) or re.search(r"day", parsed.path.lower()) or re.search(r"day", parsed.query.lower()) or re.search(r"date", parsed.path.lower()) or re.search(r"date", parsed.query.lower()) or re.search(r"week", parsed.path.lower()) or re.search(r"week", parsed.query.lower()) or re.search(r"month", parsed.path.lower()) or re.search(r"month", parsed.query.lower()) or re.search(r"event", parsed.path.lower()) or re.search(r"event", parsed.query.lower()) or re.search(r"filter", parsed.path.lower()) or re.search(r"filter", parsed.query.lower()) or re.search(r"feed", parsed.path.lower()) or re.search(r"feed", parsed.query.lower()) or re.search(r"comment", parsed.path.lower()) or re.search(r"comment", parsed.query.lower()) or re.search(r"download", parsed.path.lower())   or re.search(r"download", parsed.query.lower()) or re.search(r"upname", parsed.path.lower()) or re.search(r"upname", parsed.query.lower()) or re.search(r"action", parsed.path.lower()) or re.search(r"action", parsed.query.lower()) or re.search(r"login", parsed.path.lower()) or re.search(r"login", parsed.query.lower()) or re.search(r"logout", parsed.path.lower()) or re.search(r"logout", parsed.query.lower()) or re.search(r"edit", parsed.path.lower()) or re.search(r"edit", parsed.query.lower()) or re.search(r"page_id=", parsed.path.lower()) or re.search(r"page_id=", parsed.query.lower()) or re.search(r"attachment", parsed.path.lower()) or re.search(r"attachment", parsed.query.lower()) or re.search(r"redirect", parsed.path.lower()) or re.search(r"redirect", parsed.query.lower()) or re.search(r"type", parsed.path.lower()) or re.search(r"type", parsed.query.lower())): # Characteristic of calendars and similar traps
             return False
 
         if re.match(
