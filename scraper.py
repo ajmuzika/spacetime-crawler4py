@@ -84,7 +84,7 @@ def extract_next_links(url, resp):
                     url_check = re.sub(r'https://', "", url_check)
                     url_check = re.sub(r'http://', "", url_check)
                     url_check = re.sub(r'#.+', "", url_check)
-                    url_check = re.sub(r'/$', "", url_check)
+                    url_check = re.sub(r'/+$', "", url_check)
                     
                     if url_check not in visited:
                         linkSet.add(newURL)
@@ -122,7 +122,7 @@ def is_valid(url):
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
-            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|bib|py)$", parsed.query.lower()):
+            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|bib|py|pps|ppsx|nb|java|heic|ipynb)$", parsed.query.lower().strip()):
                 return False
         
         return not re.match(
@@ -133,7 +133,7 @@ def is_valid(url):
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
-            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|bib|py)$", parsed.path.lower())
+            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|bib|py|pps|ppsx|nb|java|heic|ipynb)$", parsed.path.lower().strip())
 
     except TypeError:
         print ("TypeError for ", parsed)
