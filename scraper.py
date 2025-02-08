@@ -46,8 +46,9 @@ def extract_next_links(url, resp):
             print("Unique Words to Total Words Ratio Too Low")
             return []
 
-        hyperlinksTotal = len(bsObject.find_all('a'))
-        if hyperlinksTotal / len(textList) > 0.75:
+        hyperlinksList = bsObject.find_all('a')
+        
+        if len(hyperlinksList) / len(textList) > 0.75:
             print("Hyperlinks to Total Words Ratio Too High")
             return []
         
@@ -59,13 +60,13 @@ def extract_next_links(url, resp):
     
             longestPage = longestPageFile.read()
     
-    
+
             if not longestPage:
-                longestPageFile.write(url + "`" + str(len(bsObject.get_text())))
+                longestPageFile.write(url + "`" + str(len(textList)))
             
-            elif (int(longestPage.split("`")[1]) < len(bsObject.get_text())):
+            elif (int(longestPage.split("`")[1]) < len(textList)):
                 longestPageFile.truncate(0)
-                longestPageFile.write(url + "`" + str(len(bsObject.get_text())))
+                longestPageFile.write(url + "`" + str(len(textList)))
             
             tokenFile.write(" ".join([x for x in nltk.word_tokenize(webpageText) if re.match(r"^[a-zA-Z-]+$|^[a-zA-Z-]+\'[a-zA-Z]+$", x)]))
     
@@ -73,7 +74,7 @@ def extract_next_links(url, resp):
             
             
             ## TODO TODO TODO cite this properly to ensure academic honesty
-            for link in bsObject.find_all('a'):
+            for link in hyperlinksList:
                 newURL = link.get('href')
     
                 if is_valid(newURL):
@@ -83,14 +84,13 @@ def extract_next_links(url, resp):
                     url_check = re.sub(r'https://', "", url_check)
                     url_check = re.sub(r'http://', "", url_check)
                     url_check = re.sub(r'#.+', "", url_check)
+                    url_check = re.sub(r'/$', "", url_check)
                     
                     if url_check not in visited:
                         linkSet.add(newURL)
 
                         visited.append(url_check)
                         linkFile.write(url_check + '\n')
-                else: 
-                    pass
     
         return list(linkSet)
 
