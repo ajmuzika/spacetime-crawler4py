@@ -1,5 +1,7 @@
 import re
 import sys
+
+# stopwords given in assignment
 stopwords = """
 a
 able
@@ -671,6 +673,9 @@ z
 zero"""
 
 
+"""
+Take file and create list of total tokens (non-unique listing)
+"""
 def tokenizer(arg=1) -> list:
     tokens: [str] = []
 
@@ -680,6 +685,9 @@ def tokenizer(arg=1) -> list:
     return list(tokens)
 
 
+"""
+Calculate frequency of each unique token
+"""
 def computeWordFrequencies(tokens: list) -> dict:
     freq: dict = {}
     for token in tokens:
@@ -690,11 +698,19 @@ def computeWordFrequencies(tokens: list) -> dict:
             freq[token] += 1
     return freq
 
+
+"""
+Refine dictionary into sorted collection from highest to lowest frequency, removing
+any words present in the stop words list. 
+"""
 def process(freq):
     return {word: value for word, value in sorted(freq.items(), key=lambda item: item[1], reverse=True)[:500] if
             word.lower() not in stopwords.splitlines()}
 
 
+"""
+Pretty-print for dictionary
+"""
 def printnew(freq: dict):
     i = 1
     for k, v in freq.items():
