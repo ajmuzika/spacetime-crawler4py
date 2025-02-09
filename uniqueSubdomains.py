@@ -23,6 +23,8 @@ def main():
 
     subdomainsList = sorted(list(subdomains.keys())) # Sorting the subdomains alphabetically
 
+    print("Number of subdomains", len(subdomainsList))
+    
     for l in subdomainsList: # Print in the prescribed format and ordering from the prompt
         print(f"{l}.ics.uci.edu, {subdomains[l]}")
 
