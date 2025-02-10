@@ -30,6 +30,14 @@ python -m pip install packages/spacetime-2.1.1-py3-none-any.whl
 python -m pip install -r packages/requirements.txt
 ```
 
+### Step 1a: Install BeautifulSoup and nltk
+
+Please install these libraries if they are not present on your machine already. They are both needed for the scraper to run successfully. If you have not done so already, please use the following commands.
+```
+pip install bs4
+pip install nltk
+```
+
 ### Step 2: Configuring config.ini
 
 Set the options in the config.ini file. The following
