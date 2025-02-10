@@ -1,7 +1,7 @@
 import re # Importing Regular Expression Library (Python Software Foundation, 2025a).
 from urllib.parse import urlparse # Importing Parse Library (Python Software Foundation, 2025b)
 from bs4 import BeautifulSoup # Importing BeautifulSoup Library (Richardson, 2025).
-import nltk # Import nltk (NLTK Project, 2024). #TODO Tell the TA in the report to install nltk
+import nltk # Import nltk (NLTK Project, 2024).
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
